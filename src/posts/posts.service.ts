@@ -5,6 +5,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 @Injectable()
 export class PostsService {
   create(createPostDto: CreatePostDto) {
+    console.log(createPostDto);
     return 'This action adds a new post';
   }
 
