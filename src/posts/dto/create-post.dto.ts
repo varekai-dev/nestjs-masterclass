@@ -8,6 +8,7 @@ import {
   IsString,
   IsUrl,
   Matches,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
@@ -24,6 +25,7 @@ export class CreatePostDto {
   })
   @IsString()
   @MinLength(4)
+  @MaxLength(512)
   @IsNotEmpty()
   title: string;
 
@@ -40,6 +42,7 @@ export class CreatePostDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(256)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message: 'must be a valid slug',
   })
@@ -73,6 +76,7 @@ export class CreatePostDto {
     description: 'The featured image URL of the post',
     example: 'https://example.com/image.jpg',
   })
+  @MaxLength(1024)
   @IsOptional()
   @IsUrl()
   featuredImageUrl?: string;
@@ -116,5 +120,5 @@ export class CreatePostDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePostMetaOptionsDto)
-  metaOptions: CreatePostMetaOptionsDto[];
+  metaOptions?: CreatePostMetaOptionsDto[];
 }

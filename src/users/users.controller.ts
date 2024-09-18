@@ -1,22 +1,20 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Ip,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { GetUserParamDto } from './dto/get-user-param.dto';
 import { PatchUserDto } from './dto/path-user.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UsersService } from './users.service';
 
 @Controller('users')
 @ApiTags('Users')
-export class UserController {
-  @Get(':id?')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get()
+  async getAllUsers() {
+    return await this.usersService.findAll();
+  }
+
+  @Get(':id')
   @ApiOperation({ summary: 'Fetches all registered users' })
   @ApiResponse({
     status: 200,
@@ -33,17 +31,9 @@ export class UserController {
     required: false,
     description: 'The position of the page',
   })
-  getUsers(@Param() getUserParamDto: GetUserParamDto, @Query() query: any) {
-    console.log(getUserParamDto);
-    console.log(query);
-    return 'work';
-  }
-
   @Post()
-  createUser(@Body() body: CreateUserDto, @Ip() ip) {
-    console.log(ip);
-    console.log(body);
-    return 'user created';
+  async createUser(@Body() body: CreateUserDto) {
+    return await this.usersService.createUser(body);
   }
 
   @Patch(':id')
