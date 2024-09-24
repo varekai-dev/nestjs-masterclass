@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Delete,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -22,5 +30,15 @@ export class PostsController {
   @ApiOperation({ summary: 'Get all posts' })
   findAll() {
     return this.postsService.findAll();
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a post' })
+  @ApiResponse({
+    status: 200,
+    description: 'The post has been successfully deleted',
+  })
+  delete(@Query('id', ParseIntPipe) id: number) {
+    return this.postsService.delete(id);
   }
 }

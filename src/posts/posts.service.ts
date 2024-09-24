@@ -27,4 +27,14 @@ export class PostsService {
       },
     });
   }
+
+  public async delete(id: number) {
+    const post = await this.postRepository.findOneBy({ id });
+
+    await this.postRepository.delete(id);
+
+    await this.metaOptionRepository.delete(post.metaOptions.id);
+
+    return { deleted: true, id };
+  }
 }
