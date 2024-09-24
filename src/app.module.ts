@@ -4,11 +4,11 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TagsModule } from './tags/tags.module';
+import { MetaOptionsModule } from './meta-options/meta-options.module';
 
 @Module({
   imports: [
-    UsersModule,
-    PostsModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         import: [],
@@ -23,6 +23,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         synchronize: true,
       }),
     }),
+    UsersModule,
+    MetaOptionsModule,
+    PostsModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
