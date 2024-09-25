@@ -32,13 +32,14 @@ export class PostsController {
     return this.postsService.findAll();
   }
 
-  @Delete(':id')
+  @Delete()
   @ApiOperation({ summary: 'Delete a post' })
   @ApiResponse({
     status: 200,
     description: 'The post has been successfully deleted',
   })
   delete(@Query('id', ParseIntPipe) id: number) {
+    console.log('id', id);
     return this.postsService.delete(id);
   }
 }

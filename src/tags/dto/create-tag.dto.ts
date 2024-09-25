@@ -11,7 +11,10 @@ import {
 } from 'class-validator';
 
 export class CreateTagDto {
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Hello World',
+    required: true,
+  })
   @IsString()
   @MinLength(3)
   @IsNotEmpty()
@@ -21,6 +24,7 @@ export class CreateTagDto {
   @ApiProperty({
     description: 'The slug of the post',
     example: 'hello-world',
+    required: true,
   })
   @IsString()
   @IsNotEmpty()
@@ -31,20 +35,29 @@ export class CreateTagDto {
   @ApiProperty({
     description: 'The slug of the post',
     example: 'hello-world',
+    required: true,
   })
   slug: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    example: 'A simple tag',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    example: '{"type": "object"}',
+  })
   @IsOptional()
   @IsJSON()
   schema?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    example: 'https://example.com/featured-image.jpg',
+    required: false,
+  })
   @IsOptional()
   @IsUrl()
   @MaxLength(1024)

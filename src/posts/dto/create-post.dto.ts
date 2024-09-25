@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsEnum,
+  IsInt,
   IsISO8601,
   IsJSON,
   IsNotEmpty,
@@ -90,24 +91,26 @@ export class CreatePostDto {
 
   @ApiPropertyOptional({
     description: 'The tags of the post',
-    example: ['tag1', 'tag2'],
+    example: [1, 2],
   })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  @MinLength(3, { each: true })
-  tags?: string[];
+  @IsInt({ each: true })
+  tags?: number[];
 
   @ApiPropertyOptional({
     type: 'object',
     required: false,
+    example: {
+      metaValue: '{"sidebarEnabled": true}',
+    },
     items: {
       type: 'object',
       properties: {
         metaValue: {
           type: 'json',
           description: 'The metaValue is a JSON string',
-          example: '{"sidebarEnabled": true,}',
+          example: '{"sidebarEnabled": true}',
         },
       },
     },
@@ -116,4 +119,13 @@ export class CreatePostDto {
   @ValidateNested({ each: true })
   @Type(() => CreatePostMetaOptionsDto)
   metaOptions?: CreatePostMetaOptionsDto | null;
+
+  @IsInt()
+  @IsNotEmpty()
+  @ApiProperty({
+    type: 'integer',
+    required: true,
+    example: 1,
+  })
+  authorId: number;
 }

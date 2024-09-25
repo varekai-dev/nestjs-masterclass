@@ -28,8 +28,6 @@ export class UsersService {
 
     const newUser = this.usersRepository.create(createUserDto);
 
-    console.log(newUser);
-
     await this.usersRepository.save(newUser);
 
     return newUser;
@@ -47,11 +45,9 @@ export class UsersService {
    * @param {number} id - User id
    * @returns {Object} - User
    */
-  findById(id: number) {
-    return {
-      id: id,
-      name: 'John Doe',
-      email: 'serhijsav@gmail.com',
-    };
+  async findById(id: number) {
+    return await this.usersRepository.findOne({
+      where: { id },
+    });
   }
 }
