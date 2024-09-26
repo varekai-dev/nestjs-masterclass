@@ -18,7 +18,7 @@ import { MetaOptionsModule } from './meta-options/meta-options.module';
         port: 5432,
         username: 'postgres',
         password: 'postgres',
-        database: 'nestjs-blog',
+        database: 'nestjs-masterclass',
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),

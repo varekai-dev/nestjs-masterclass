@@ -6,6 +6,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { MetaOption } from 'src/meta-options/entities/meta-option.entity';
 import { UsersService } from 'src/users/users.service';
 import { TagsService } from 'src/tags/tags.service';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -44,5 +45,26 @@ export class PostsService {
   public async delete(id: number) {
     await this.postRepository.delete(id);
     return { deleted: true, id };
+  }
+
+  public async update(updatePostDto: UpdatePostDto) {
+    const post = await this.postRepository.findOneBy({
+      id: updatePostDto.id,
+    });
+
+    post.title = updatePostDto.title ?? post.title;
+    post.content = updatePostDto.content ?? post.content;
+    post.status = updatePostDto.status ?? post.status;
+    post.postType = updatePostDto.postType ?? post.postType;
+    post.slug = updatePostDto.slug ?? post.slug;
+    post.featuredImageUrl =
+      updatePostDto.featuredImageUrl ?? post.featuredImageUrl;
+    post.publishOn = updatePostDto.publishOn ?? post.publishOn;
+
+    if (updatePostDto.tags) {
+      const tags = await this.tagsService.findMultipleTags(updatePostDto.tags);
+      post.tags = tags;
+    }
+    return await this.postRepository.save(post);
   }
 }
