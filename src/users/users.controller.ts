@@ -1,16 +1,19 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PatchUserDto } from './dto/path-user.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { GetUserParamsDto } from './dto/get-user-params.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -34,8 +37,12 @@ export class UsersController {
     description: 'The position of the page',
   })
   @Get()
-  async getAllUsers() {
-    return await this.usersService.findAll();
+  async getAllUsers(
+    @Param() getUserParamDto: GetUserParamsDto,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    return await this.usersService.findAll(getUserParamDto, limit, page);
   }
 
   @ApiOperation({ summary: 'Fetches one single user' })

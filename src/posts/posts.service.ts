@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
@@ -48,9 +52,20 @@ export class PostsService {
   }
 
   public async update(updatePostDto: UpdatePostDto) {
-    const post = await this.postRepository.findOneBy({
-      id: updatePostDto.id,
-    });
+    let post;
+    try {
+      post = await this.postRepository.findOneBy({
+        id: updatePostDto.id,
+      });
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process request at the moment',
+      );
+    }
+
+    if (!post) {
+      throw new BadRequestException('Post not found');
+    }
 
     post.title = updatePostDto.title ?? post.title;
     post.content = updatePostDto.content ?? post.content;
@@ -62,9 +77,30 @@ export class PostsService {
     post.publishOn = updatePostDto.publishOn ?? post.publishOn;
 
     if (updatePostDto.tags) {
-      const tags = await this.tagsService.findMultipleTags(updatePostDto.tags);
-      post.tags = tags;
+      try {
+        const tags = await this.tagsService.findMultipleTags(
+          updatePostDto.tags,
+        );
+
+        if (!tags || tags.length !== updatePostDto.tags.length) {
+          throw new BadRequestException('Some tags were not found');
+        }
+
+        post.tags = tags;
+      } catch (error) {
+        throw new RequestTimeoutException(
+          'Unable to process request at the moment',
+        );
+      }
     }
-    return await this.postRepository.save(post);
+
+    try {
+      await this.postRepository.save(post);
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process request at the moment',
+      );
+    }
+    return post;
   }
 }

@@ -1,10 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  RequestTimeoutException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import profileConfig from './config/profile.config';
+import { GetUserParamsDto } from './dto/get-user-params.dto';
 
 /**
  *  Class to connect to Users table and perform business logic
@@ -27,32 +36,57 @@ export class UsersService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const userExist = await this.usersRepository.findOne({
-      where: { email: createUserDto.email },
-    });
+    try {
+      const userExist = await this.usersRepository.findOne({
+        where: { email: createUserDto.email },
+      });
+      console.log('userExist', userExist);
+      if (userExist) {
+        throw new UnauthorizedException('User already exist');
+      }
 
-    if (userExist) {
-      return 'User already exists';
+      const newUser = this.usersRepository.create(createUserDto);
+
+      await this.usersRepository.save(newUser);
+
+      return newUser;
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process request at the moment',
+        {
+          description: 'Error connection to database',
+        },
+      );
     }
-
-    const newUser = this.usersRepository.create(createUserDto);
-
-    await this.usersRepository.save(newUser);
-
-    return newUser;
   }
   /**
    *  The method to get all users from database
    * @returns {Array} - Array of users
    */
-  async findAll() {
-    const key = this.profileConfiguration.apiKey;
-    console.log('key', key);
+  async findAll(getUserParamDto: GetUserParamsDto, limt: number, page: number) {
+    try {
+      const key = this.profileConfiguration.apiKey;
+      console.log('key', key);
 
-    const environment = this.configService.get<string>('S3_BUCKET');
-    console.log('environment', environment);
+      const environment = this.configService.get<string>('S3_BUCKET');
+      console.log('environment', environment);
 
-    return await this.usersRepository.find();
+      return await this.usersRepository.find();
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.MOVED_PERMANENTLY,
+          error: 'This is a custom message',
+          fileName: 'users.service.ts',
+          lineNumber: 80,
+        },
+        HttpStatus.MOVED_PERMANENTLY,
+        {
+          cause: new Error(),
+          description: 'Error fetching users',
+        },
+      );
+    }
   }
 
   /**
@@ -61,8 +95,19 @@ export class UsersService {
    * @returns {Object} - User
    */
   async findById(id: number) {
-    return await this.usersRepository.findOne({
-      where: { id },
-    });
+    let user = undefined;
+    try {
+      user = await this.usersRepository.findOne({
+        where: { id },
+      });
+
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }
