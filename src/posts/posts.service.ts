@@ -8,9 +8,9 @@ import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { MetaOption } from 'src/meta-options/entities/meta-option.entity';
-import { UsersService } from 'src/users/users.service';
 import { TagsService } from 'src/tags/tags.service';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { UsersService } from 'src/users/providers/users.service';
 
 @Injectable()
 export class PostsService {
